@@ -34,7 +34,7 @@ from airflow.utils import timezone
 from airflow.utils.session import create_session
 from airflow.utils.state import DagRunState
 from airflow.utils.types import DagRunType
-from tests.test_utils.db import clear_db_pools
+from tests.test_utils.db import clear_db_dags, clear_db_pools
 
 EXECDATE = timezone.utcnow()
 EXECDATE_NOFRACTIONS = EXECDATE.replace(microsecond=0)
@@ -45,7 +45,12 @@ class TestLocalClient(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        clear_db_dags()
         DagBag(example_bash_operator.__file__).get_dag("example_bash_operator").sync_to_db()
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        clear_db_dags()
 
     def setUp(self):
         super().setUp()
